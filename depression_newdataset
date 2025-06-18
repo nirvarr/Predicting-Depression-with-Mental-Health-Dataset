@@ -18,7 +18,7 @@ library(gridExtra)
 library(readxl)
 
 # loading dataset
-df <- read_excel("normalized_mental_health2.xlsx") 
+df <- read_excel("normalized_mental_health.xlsx") 
 cat("\n\n\n") #printing new lines here
 
 print("We will now COMPUTE various kinds of REGRESSION on our Mental Health dataset")
