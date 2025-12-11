@@ -242,6 +242,7 @@ r2_values <- c(
 barplot(r2_values, names.arg = model_names, col = "darkgreen", 
         main = "Model Comparison - R-Squared Score",
         ylab = "R-Squared", las = 2, ylim = c(0, 1))
+# R-squared of 0.7 is commonly considered a good threshold for regression models
 abline(h = 0.7, col = "red", lty = 2)
 legend("topright", legend = "Target (0.7)", col = "red", lty = 2)
 dev.off()
