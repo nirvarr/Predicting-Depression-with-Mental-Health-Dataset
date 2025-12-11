@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depression Prediction - Visualization Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .search-container {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        #searchInput {
+            width: 60%;
+            min-width: 250px;
+            max-width: 800px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        #searchInput:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .filter-buttons {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .filter-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .filter-btn.active {
+            background: #764ba2;
+            font-weight: bold;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            background: #f8f9fa;
+            padding: 10px;
+        }
+        
+        .gallery-item .info {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .gallery-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+        
+        .gallery-item p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .gallery-item .tags {
+            margin-top: 10px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #bbb;
+        }
+        
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-top: 50px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Depression Prediction Visualizations</h1>
+        <p class="subtitle">Explore model performance metrics and data insights</p>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 Search visualizations by name, category, or keyword...">
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterGallery(event, 'all')">All</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'model')">Model Comparison</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'feature')">Feature Analysis</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'prediction')">Predictions</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'distribution')">Distributions</button>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            <!-- Model Comparison RMSE -->
+            <div class="gallery-item" data-category="model" data-keywords="rmse error metrics comparison performance">
+                <img src="plots/model_comparison_rmse.png" alt="Model Comparison RMSE" 
+                     role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Model Comparison - RMSE</h3>
+                    <p>Root Mean Square Error comparison across all regression models. Lower values indicate better performance.</p>
+                    <div class="tags">
+                        <span class="tag">Model Comparison</span>
+                        <span class="tag">RMSE</span>
+                        <span class="tag">Performance</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model Comparison R2 -->
+            <div class="gallery-item" data-category="model" data-keywords="r2 r-squared metrics comparison performance">
+                <img src="plots/model_comparison_r2.png" alt="Model Comparison R2" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Model Comparison - R²</h3>
+                    <p>R-Squared scores showing the proportion of variance explained by each model. Higher is better.</p>
+                    <div class="tags">
+                        <span class="tag">Model Comparison</span>
+                        <span class="tag">R-Squared</span>
+                        <span class="tag">Performance</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Correlation Heatmap -->
+            <div class="gallery-item" data-category="feature" data-keywords="correlation heatmap features relationships">
+                <img src="plots/correlation_heatmap.png" alt="Correlation Heatmap" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Feature Correlation Heatmap</h3>
+                    <p>Correlation matrix showing relationships between features and depression scores.</p>
+                    <div class="tags">
+                        <span class="tag">Correlation</span>
+                        <span class="tag">Features</span>
+                        <span class="tag">Heatmap</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actual vs Predicted -->
+            <div class="gallery-item" data-category="prediction" data-keywords="actual predicted random forest scatter accuracy">
+                <img src="plots/actual_vs_predicted_rf.png" alt="Actual vs Predicted" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Actual vs Predicted (Random Forest)</h3>
+                    <p>Scatter plot comparing actual depression scores with Random Forest predictions. Points closer to the red line indicate better predictions.</p>
+                    <div class="tags">
+                        <span class="tag">Random Forest</span>
+                        <span class="tag">Predictions</span>
+                        <span class="tag">Accuracy</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Decision Tree -->
+            <div class="gallery-item" data-category="model" data-keywords="decision tree visualization structure rules">
+                <img src="plots/decision_tree.png" alt="Decision Tree" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Decision Tree Visualization</h3>
+                    <p>Visual representation of the decision tree model showing how it makes predictions based on feature values.</p>
+                    <div class="tags">
+                        <span class="tag">Decision Tree</span>
+                        <span class="tag">Structure</span>
+                        <span class="tag">Rules</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature Importance -->
+            <div class="gallery-item" data-category="feature" data-keywords="feature importance random forest variables">
+                <img src="plots/feature_importance_rf.png" alt="Feature Importance" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Feature Importance (Random Forest)</h3>
+                    <p>Ranking of features by their importance in the Random Forest model. Higher values mean greater impact on predictions.</p>
+                    <div class="tags">
+                        <span class="tag">Feature Importance</span>
+                        <span class="tag">Random Forest</span>
+                        <span class="tag">Variables</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Residuals -->
+            <div class="gallery-item" data-category="prediction" data-keywords="residuals linear regression errors diagnostics">
+                <img src="plots/residuals_linear.png" alt="Residual Plot" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Residual Plot (Linear Regression)</h3>
+                    <p>Residual plot for linear regression model. Points should be randomly scattered around zero for a good fit.</p>
+                    <div class="tags">
+                        <span class="tag">Residuals</span>
+                        <span class="tag">Linear Regression</span>
+                        <span class="tag">Diagnostics</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model Metrics Comparison -->
+            <div class="gallery-item" data-category="model" data-keywords="metrics comparison rmse mae r2 performance">
+                <img src="plots/model_metrics_comparison.png" alt="Model Metrics" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Comprehensive Model Metrics</h3>
+                    <p>Side-by-side comparison of RMSE, MAE, and R² scores for all models.</p>
+                    <div class="tags">
+                        <span class="tag">All Metrics</span>
+                        <span class="tag">Comparison</span>
+                        <span class="tag">Performance</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Distribution Comparison -->
+            <div class="gallery-item" data-category="distribution" data-keywords="distribution histogram actual predicted density">
+                <img src="plots/distribution_comparison.png" alt="Distribution Comparison" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
+                <div class="info">
+                    <h3>Distribution Comparison</h3>
+                    <p>Comparison of actual depression score distribution vs predicted scores from Random Forest model.</p>
+                    <div class="tags">
+                        <span class="tag">Distribution</span>
+                        <span class="tag">Histogram</span>
+                        <span class="tag">Density</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="no-results" id="noResults">
+            No visualizations found matching your search criteria.
+        </div>
+    </div>
+    
+    <!-- Modal for full-size image viewing -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const gallery = document.getElementById('gallery');
+        const galleryItems = gallery.getElementsByClassName('gallery-item');
+        const noResults = document.getElementById('noResults');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let visibleCount = 0;
+            
+            for (let item of galleryItems) {
+                const keywords = item.dataset.keywords || '';
+                const title = item.querySelector('h3').textContent.toLowerCase();
+                const description = item.querySelector('p').textContent.toLowerCase();
+                const tags = item.querySelector('.tags').textContent.toLowerCase();
+                
+                const searchableText = `${title} ${description} ${keywords} ${tags}`;
+                
+                if (searchableText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+            
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+        
+        // Filter functionality
+        let currentFilter = 'all';
+        
+        function filterGallery(event, category) {
+            currentFilter = category;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let visibleCount = 0;
+            
+            for (let item of galleryItems) {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+            
+            searchInput.value = '';
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+        
+        // Modal functionality
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Keyboard handler for interactive images
+        function handleImageKeyPress(event, src) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                openModal(src);
+                event.preventDefault();
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

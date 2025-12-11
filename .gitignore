@@ -1,0 +1,18 @@
+# R related
+.Rhistory
+.RData
+.Rproj.user
+*.Rproj
+
+# Temporary files
+*~
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# Plots directory (generated files)
+# We'll keep this commented out to include sample plots in the repo
+# plots/
+
+# Excel lock files
+~$*.xlsx

@@ -191,4 +191,172 @@ results <- rbind(
 
 cat("\n\n\n\n\n") #new line for clarity
 print("The ERROR METRICS are provided below:")
-print(results) 
+print(results)
+
+# Create directory for plots if it doesn't exist
+if (!dir.exists("plots")) {
+  dir.create("plots")
+  cat("\nCreated 'plots' directory for visualizations\n")
+}
+
+# =============================================================================
+# VISUALIZATION SECTION - Generate plots for model comparison and analysis
+# =============================================================================
+
+# Define visualization constants
+R2_TARGET_THRESHOLD <- 0.7  # R-squared value considered good for regression models
+
+cat("\n\nGenerating visualizations...\n")
+
+# 1. Model Performance Comparison - RMSE
+png("plots/model_comparison_rmse.png", width = 1000, height = 600)
+rmse_values <- c(
+  rmse(y_test, lm_pred),
+  rmse(y_test, ridge_pred),
+  rmse(y_test, lasso_pred),
+  rmse(y_test, elastic_pred),
+  rmse(y_test, tree_pred),
+  rmse(y_test, rf_pred),
+  rmse(y_test, gbm_pred),
+  rmse(y_test, svr_pred),
+  rmse(y_test, xgb_pred)
+)
+model_names <- c("Linear", "Ridge", "Lasso", "Elastic Net", "Decision Tree", 
+                 "Random Forest", "GBM", "SVR", "XGBoost")
+barplot(rmse_values, names.arg = model_names, col = "steelblue", 
+        main = "Model Comparison - Root Mean Square Error (RMSE)",
+        ylab = "RMSE", las = 2, ylim = c(0, max(rmse_values) * 1.1))
+dev.off()
+cat("✓ Saved: plots/model_comparison_rmse.png\n")
+
+# 2. Model Performance Comparison - R-squared
+png("plots/model_comparison_r2.png", width = 1000, height = 600)
+r2_values <- c(
+  r2(y_test, lm_pred),
+  r2(y_test, ridge_pred),
+  r2(y_test, lasso_pred),
+  r2(y_test, elastic_pred),
+  r2(y_test, tree_pred),
+  r2(y_test, rf_pred),
+  r2(y_test, gbm_pred),
+  r2(y_test, svr_pred),
+  r2(y_test, xgb_pred)
+)
+barplot(r2_values, names.arg = model_names, col = "darkgreen", 
+        main = "Model Comparison - R-Squared Score",
+        ylab = "R-Squared", las = 2, ylim = c(0, 1))
+# Add reference line for good model performance threshold
+abline(h = R2_TARGET_THRESHOLD, col = "red", lty = 2)
+legend("topright", legend = paste0("Target (", R2_TARGET_THRESHOLD, ")"), col = "red", lty = 2)
+dev.off()
+cat("✓ Saved: plots/model_comparison_r2.png\n")
+
+# 3. Correlation Heatmap of Features
+png("plots/correlation_heatmap.png", width = 800, height = 800)
+numeric_cols <- sapply(train_raw, is.numeric)
+cor_matrix <- cor(train_raw[, numeric_cols], use = "complete.obs")
+par(mar = c(8, 8, 2, 2))
+image(1:ncol(cor_matrix), 1:nrow(cor_matrix), t(cor_matrix[nrow(cor_matrix):1, ]), 
+      col = colorRampPalette(c("blue", "white", "red"))(100),
+      xlab = "", ylab = "", axes = FALSE, main = "Feature Correlation Heatmap")
+axis(1, at = 1:ncol(cor_matrix), labels = colnames(cor_matrix), las = 2, cex.axis = 0.8)
+axis(2, at = 1:nrow(cor_matrix), labels = rev(rownames(cor_matrix)), las = 2, cex.axis = 0.8)
+dev.off()
+cat("✓ Saved: plots/correlation_heatmap.png\n")
+
+# 4. Actual vs Predicted - Best Model (Random Forest typically performs well)
+png("plots/actual_vs_predicted_rf.png", width = 800, height = 800)
+plot(y_test, rf_pred, pch = 19, col = rgb(0, 0, 1, 0.5),
+     main = "Random Forest: Actual vs Predicted Depression Scores",
+     xlab = "Actual Depression Score", ylab = "Predicted Depression Score",
+     xlim = c(min(c(y_test, rf_pred)), max(c(y_test, rf_pred))),
+     ylim = c(min(c(y_test, rf_pred)), max(c(y_test, rf_pred))))
+abline(0, 1, col = "red", lwd = 2)
+grid()
+legend("topleft", legend = c("Predictions", "Perfect Fit"), 
+       col = c(rgb(0, 0, 1, 0.5), "red"), pch = c(19, NA), lty = c(NA, 1), lwd = c(NA, 2))
+dev.off()
+cat("✓ Saved: plots/actual_vs_predicted_rf.png\n")
+
+# 5. Decision Tree Visualization
+png("plots/decision_tree.png", width = 1200, height = 800)
+rpart.plot(tree_model, main = "Decision Tree for Depression Prediction",
+           extra = 101, box.palette = "RdYlGn", shadow.col = "gray", nn = TRUE)
+dev.off()
+cat("✓ Saved: plots/decision_tree.png\n")
+
+# 6. Feature Importance from Random Forest
+png("plots/feature_importance_rf.png", width = 900, height = 600)
+importance_rf <- importance(rf_model)
+importance_df <- data.frame(
+  Feature = rownames(importance_rf),
+  Importance = importance_rf[, 1]
+)
+importance_df <- importance_df[order(importance_df$Importance, decreasing = TRUE), ]
+par(mar = c(5, 10, 4, 2))
+barplot(importance_df$Importance, names.arg = importance_df$Feature, 
+        horiz = TRUE, las = 1, col = "coral",
+        main = "Feature Importance - Random Forest Model",
+        xlab = "Importance (IncNodePurity)")
+dev.off()
+cat("✓ Saved: plots/feature_importance_rf.png\n")
+
+# 7. Residual Plot for Linear Model
+png("plots/residuals_linear.png", width = 800, height = 600)
+residuals_lm <- y_test - lm_pred
+plot(lm_pred, residuals_lm, pch = 19, col = rgb(0.2, 0.5, 0.8, 0.6),
+     main = "Residual Plot - Linear Regression",
+     xlab = "Predicted Values", ylab = "Residuals")
+abline(h = 0, col = "red", lwd = 2, lty = 2)
+grid()
+dev.off()
+cat("✓ Saved: plots/residuals_linear.png\n")
+
+# 8. Model Comparison - All Metrics Combined
+png("plots/model_metrics_comparison.png", width = 1200, height = 800)
+mae_values <- c(
+  mae(y_test, lm_pred),
+  mae(y_test, ridge_pred),
+  mae(y_test, lasso_pred),
+  mae(y_test, elastic_pred),
+  mae(y_test, tree_pred),
+  mae(y_test, rf_pred),
+  mae(y_test, gbm_pred),
+  mae(y_test, svr_pred),
+  mae(y_test, xgb_pred)
+)
+
+metrics_matrix <- rbind(
+  RMSE = rmse_values,
+  MAE = mae_values,
+  R2 = r2_values
+)
+colnames(metrics_matrix) <- model_names
+
+par(mar = c(8, 4, 4, 2))
+barplot(metrics_matrix, beside = TRUE, las = 2, 
+        col = c("steelblue", "orange", "darkgreen"),
+        main = "Comprehensive Model Metrics Comparison",
+        ylab = "Score", legend.text = TRUE,
+        args.legend = list(x = "topright", bty = "n"))
+dev.off()
+cat("✓ Saved: plots/model_metrics_comparison.png\n")
+
+# 9. Distribution of Actual vs Predicted (Random Forest)
+png("plots/distribution_comparison.png", width = 1000, height = 600)
+par(mfrow = c(1, 2))
+hist(y_test, breaks = 20, col = rgb(0, 0, 1, 0.5), 
+     main = "Distribution of Actual Depression Scores",
+     xlab = "Depression Score", freq = FALSE)
+lines(density(y_test), col = "darkblue", lwd = 2)
+
+hist(rf_pred, breaks = 20, col = rgb(1, 0, 0, 0.5), 
+     main = "Distribution of Predicted Depression Scores (RF)",
+     xlab = "Depression Score", freq = FALSE)
+lines(density(rf_pred), col = "darkred", lwd = 2)
+par(mfrow = c(1, 1))
+dev.off()
+cat("✓ Saved: plots/distribution_comparison.png\n")
+
+cat("\n✓ All visualizations generated successfully!\n")
+cat("✓ Plots saved in 'plots/' directory\n\n") 
