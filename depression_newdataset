@@ -203,6 +203,9 @@ if (!dir.exists("plots")) {
 # VISUALIZATION SECTION - Generate plots for model comparison and analysis
 # =============================================================================
 
+# Define visualization constants
+R2_TARGET_THRESHOLD <- 0.7  # R-squared value considered good for regression models
+
 cat("\n\nGenerating visualizations...\n")
 
 # 1. Model Performance Comparison - RMSE
@@ -242,9 +245,9 @@ r2_values <- c(
 barplot(r2_values, names.arg = model_names, col = "darkgreen", 
         main = "Model Comparison - R-Squared Score",
         ylab = "R-Squared", las = 2, ylim = c(0, 1))
-# R-squared of 0.7 is commonly considered a good threshold for regression models
-abline(h = 0.7, col = "red", lty = 2)
-legend("topright", legend = "Target (0.7)", col = "red", lty = 2)
+# Add reference line for good model performance threshold
+abline(h = R2_TARGET_THRESHOLD, col = "red", lty = 2)
+legend("topright", legend = paste0("Target (", R2_TARGET_THRESHOLD, ")"), col = "red", lty = 2)
 dev.off()
 cat("✓ Saved: plots/model_comparison_r2.png\n")
 

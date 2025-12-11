@@ -48,6 +48,8 @@
         
         #searchInput {
             width: 60%;
+            min-width: 250px;
+            max-width: 800px;
             padding: 12px 20px;
             font-size: 16px;
             border: 2px solid #667eea;
@@ -205,17 +207,20 @@
         </div>
         
         <div class="filter-buttons">
-            <button class="filter-btn active" onclick="filterGallery('all')">All</button>
-            <button class="filter-btn" onclick="filterGallery('model')">Model Comparison</button>
-            <button class="filter-btn" onclick="filterGallery('feature')">Feature Analysis</button>
-            <button class="filter-btn" onclick="filterGallery('prediction')">Predictions</button>
-            <button class="filter-btn" onclick="filterGallery('distribution')">Distributions</button>
+            <button class="filter-btn active" onclick="filterGallery(event, 'all')">All</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'model')">Model Comparison</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'feature')">Feature Analysis</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'prediction')">Predictions</button>
+            <button class="filter-btn" onclick="filterGallery(event, 'distribution')">Distributions</button>
         </div>
         
         <div class="gallery" id="gallery">
             <!-- Model Comparison RMSE -->
             <div class="gallery-item" data-category="model" data-keywords="rmse error metrics comparison performance">
-                <img src="plots/model_comparison_rmse.png" alt="Model Comparison RMSE" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/model_comparison_rmse.png" alt="Model Comparison RMSE" 
+                     role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Model Comparison - RMSE</h3>
                     <p>Root Mean Square Error comparison across all regression models. Lower values indicate better performance.</p>
@@ -229,7 +234,9 @@
             
             <!-- Model Comparison R2 -->
             <div class="gallery-item" data-category="model" data-keywords="r2 r-squared metrics comparison performance">
-                <img src="plots/model_comparison_r2.png" alt="Model Comparison R2" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/model_comparison_r2.png" alt="Model Comparison R2" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Model Comparison - R²</h3>
                     <p>R-Squared scores showing the proportion of variance explained by each model. Higher is better.</p>
@@ -243,7 +250,9 @@
             
             <!-- Correlation Heatmap -->
             <div class="gallery-item" data-category="feature" data-keywords="correlation heatmap features relationships">
-                <img src="plots/correlation_heatmap.png" alt="Correlation Heatmap" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/correlation_heatmap.png" alt="Correlation Heatmap" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Feature Correlation Heatmap</h3>
                     <p>Correlation matrix showing relationships between features and depression scores.</p>
@@ -257,7 +266,9 @@
             
             <!-- Actual vs Predicted -->
             <div class="gallery-item" data-category="prediction" data-keywords="actual predicted random forest scatter accuracy">
-                <img src="plots/actual_vs_predicted_rf.png" alt="Actual vs Predicted" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/actual_vs_predicted_rf.png" alt="Actual vs Predicted" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Actual vs Predicted (Random Forest)</h3>
                     <p>Scatter plot comparing actual depression scores with Random Forest predictions. Points closer to the red line indicate better predictions.</p>
@@ -271,7 +282,9 @@
             
             <!-- Decision Tree -->
             <div class="gallery-item" data-category="model" data-keywords="decision tree visualization structure rules">
-                <img src="plots/decision_tree.png" alt="Decision Tree" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/decision_tree.png" alt="Decision Tree" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Decision Tree Visualization</h3>
                     <p>Visual representation of the decision tree model showing how it makes predictions based on feature values.</p>
@@ -285,7 +298,9 @@
             
             <!-- Feature Importance -->
             <div class="gallery-item" data-category="feature" data-keywords="feature importance random forest variables">
-                <img src="plots/feature_importance_rf.png" alt="Feature Importance" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/feature_importance_rf.png" alt="Feature Importance" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Feature Importance (Random Forest)</h3>
                     <p>Ranking of features by their importance in the Random Forest model. Higher values mean greater impact on predictions.</p>
@@ -299,7 +314,9 @@
             
             <!-- Residuals -->
             <div class="gallery-item" data-category="prediction" data-keywords="residuals linear regression errors diagnostics">
-                <img src="plots/residuals_linear.png" alt="Residual Plot" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/residuals_linear.png" alt="Residual Plot" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Residual Plot (Linear Regression)</h3>
                     <p>Residual plot for linear regression model. Points should be randomly scattered around zero for a good fit.</p>
@@ -313,7 +330,9 @@
             
             <!-- Model Metrics Comparison -->
             <div class="gallery-item" data-category="model" data-keywords="metrics comparison rmse mae r2 performance">
-                <img src="plots/model_metrics_comparison.png" alt="Model Metrics" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/model_metrics_comparison.png" alt="Model Metrics" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Comprehensive Model Metrics</h3>
                     <p>Side-by-side comparison of RMSE, MAE, and R² scores for all models.</p>
@@ -327,7 +346,9 @@
             
             <!-- Distribution Comparison -->
             <div class="gallery-item" data-category="distribution" data-keywords="distribution histogram actual predicted density">
-                <img src="plots/distribution_comparison.png" alt="Distribution Comparison" onclick="openModal(this.src)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){openModal(this.src);event.preventDefault();}">
+                <img src="plots/distribution_comparison.png" alt="Distribution Comparison" role="button" tabindex="0" 
+                     onclick="openModal(this.src)" 
+                     onkeydown="handleImageKeyPress(event, this.src)">
                 <div class="info">
                     <h3>Distribution Comparison</h3>
                     <p>Comparison of actual depression score distribution vs predicted scores from Random Forest model.</p>
@@ -384,7 +405,7 @@
         // Filter functionality
         let currentFilter = 'all';
         
-        function filterGallery(category) {
+        function filterGallery(event, category) {
             currentFilter = category;
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
@@ -419,6 +440,14 @@
         
         function closeModal() {
             document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Keyboard handler for interactive images
+        function handleImageKeyPress(event, src) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                openModal(src);
+                event.preventDefault();
+            }
         }
         
         // Close modal with Escape key

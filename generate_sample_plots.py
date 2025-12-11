@@ -44,7 +44,7 @@ def create_placeholder(filename, title, width=800, height=600):
     y = (height - text_height) / 2 - 30
     
     # Draw shadow
-    draw.text((x+3, y+3), title, fill='rgba(0,0,0,128)', font=font)
+    draw.text((x+3, y+3), title, fill=(0, 0, 0, 128), font=font)
     # Draw text
     draw.text((x, y), title, fill='white', font=font)
     
@@ -54,7 +54,7 @@ def create_placeholder(filename, title, width=800, height=600):
     text_width2 = bbox2[2] - bbox2[0]
     x2 = (width - text_width2) / 2
     y2 = y + text_height + 20
-    draw.text((x2, y2), subtitle, fill='rgba(255,255,255,200)', font=small_font)
+    draw.text((x2, y2), subtitle, fill=(255, 255, 255, 200), font=small_font)
     
     # Save image
     img.save(filename)
