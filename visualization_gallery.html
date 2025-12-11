@@ -409,11 +409,7 @@
             currentFilter = category;
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Safely add active class to the clicked button
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
+            event.target.classList.add('active');
             
             let visibleCount = 0;
             
